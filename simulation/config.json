@@ -1,0 +1,47 @@
+{
+    "TIME_SCALING": 1.0,
+    "QUAD_DYNAMICS_UPDATE": 0.002,
+    "CONTROLLER_DYNAMICS_UPDATE": 0.005,
+    "QUADCOPTERS":[
+       {
+           "drone_id": "Drone_1",
+           "position": [0,0,0],
+           "orientation": [0,0,0],
+           "L": 0.3,
+           "r": 0.1,
+           "prop_size": [10,4.5],
+           "weight": 1.2        
+        },
+
+        {
+            "drone_id": "Drone_2",
+            "position": [0,0,0],
+            "orientation": [0,0,0],
+            "L": 0.3,
+            "r": 0.1,
+            "prop_size": [10,4.5],
+            "weight": 1.2        
+         }
+   ],
+
+   "CONTROLLER": [
+       {
+           "controller_no": 1,
+           "Motor_limits": [4000,9000],
+           "Tilt_limits": [-10,10],
+           "Yaw_Control_Limits": [-900,900],
+           "Z_XY_offset":500,
+           "Linear_PID": {
+               "P": [300,300,7000],
+               "I": [0.04,0.04,4.5],
+               "D":[450,450,5000]
+            },
+            "Linear_To_Angular_Scaler": [1,1,0],
+            "Yaw_Rate_Scaler":0.18,
+            "Angular_PID":{
+                "P":[22000,22000,1500],
+                "I":[0,0,1.2],
+                "D":[12000,12000,0]}
+        }
+    ]
+} 
