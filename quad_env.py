@@ -1,13 +1,13 @@
 import gym
 from gym import spaces
-import quadcopter,gui,controller
+from simulation import quadcopter,gui,controller
 import numpy as np
 import signal
 import sys
 
-#PARAMS
+#### PARAMETERS  ############################################################################################################
 TIME_SCALING = 1.0 # Any positive number(Smaller is faster). 1.0->Real Time, 0.0->Run as fast as possible
-QUAD_DYNAMICS_UPDATE = 0.002 # seconds
+QUAD_DYNAMICS_UPDATE = 0.002 # seconwds
 CONTROLLER_DYNAMICS_UPDATE = 0.005 # seconds
 GOALS = [(1,1,4),(1,-1,4)]
 YAWS = [0,3.14,-1.54,1.54]
@@ -23,7 +23,7 @@ CONTROLLER_PARAMETERS = {'Motor_limits':[4000,9000],
                     'Yaw_Rate_Scaler':0.18,
                     'Angular_PID':{'P':[22000,22000,1500],'I':[0,0,1.2],'D':[12000,12000,0]},
                     }
-
+############################################################################################################################
 
 class DroneEnv(gym.Env):
     def __init__(self):
@@ -32,12 +32,10 @@ class DroneEnv(gym.Env):
         # They must be gym.spaces objects
         # Example when using discrete actions:
         self.motor_limits=CONTROLLER_PARAMETERS["Motor_limits"]
-        self.action_space = spaces.Box(low=self.motor_limits[0], high=self.motor_limits[1], shape=())
+        self.action_space = self._action_space()
         # Example for using image as input (channel-first; channel-last also works):
-        self.observation_space = spaces.Tuple(spaces.Box(low=None, high=None , shape=(3)),
-                                              spaces.Box(low= -np.pi, high=np.pi , shape=(3)),
-                                              spaces.Box(low=None, high=None , shape=(3)),
-                                              spaces.Box(low=None, high=None , shape=(3)))
+        self.observation_space = self._observation_space()
+        
         
         
         self.quad=quadcopter.Quadcopter(QUADCOPTER)
@@ -64,6 +62,16 @@ class DroneEnv(gym.Env):
         self.quad.reset()
         observation=self.quad.get_state()
         return observation  # reward, done, info can't be included
+    
+    def _observation_space(self):
+        lower_bound = np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi, -np.pi])
+        upper_bound = np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.pi, np.pi, np.pi, np.pi, np.pi, np.pi])
+        return spaces.Box(low=lower_bound, high= upper_bound)
+    
+    def _action_space(self):
+        lower_bound= np.array([self.motor_limits[0], self.motor_limits[0], self.motor_limits[0], self.motor_limits[0]])
+        upper_bound= np.array([self.motor_limits[1], self.motor_limits[1], self.motor_limits[1], self.motor_limits[1]])
+        return spaces.Box(low=lower_bound, high=upper_bound)
     
     def render(self, mode='human'):
         print(f"GOAL: {GOALS} POS: {self.quad.get_position('q1')}")
